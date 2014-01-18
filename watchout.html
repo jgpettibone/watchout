@@ -1,102 +1,145 @@
 <!DOCTYPE html>
 <html>
   <body>
-Watchout!
+    <div class="container">
+      <h1>Watchout!</h1>
+      <div id="scores">
+        <h3>High Score<span id="high-score"></h3>
+        <h3>Score<span id="score"></h3>
+      </div>
+    </div
   </body>
     <script src="http://d3js.org/d3.v3.min.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
 
     <script>
-    var width = 960,
-        height = 500,
+    var width = 700,
+        height = 450,
         radius = 10;
+
     var nEnemies = 30;
 
-    var svg = d3.select("body").append("svg")
+    var highScore = 0,
+        score = 0;
+
+    d3.select("#high-score").text(highScore);
+    d3.select("#score").text(score);
+
+    var updateScore = function() {
+      d3.select("#score").text(score);
+    }
+
+    var updateHighScore = function() {
+      if (score > highScore) {
+        highScore = score;
+      }
+      d3.select("#high-score").text(highScore);
+    }
+
+    var svg = d3.select(".container").append("svg")
         .attr("width", width)
         .attr("height", height);
 
-    var playerData = [{x:480, y:250}];
-    var data = _.range(0,nEnemies).map(function(i){return i;});
+    var playerData = [{x:width/2, y:height/2}];
+    var data = d3.range(nEnemies);
 
     var drag = d3.behavior.drag()
         .on("drag", function(d,i) {
             d.x += d3.event.dx
             d.y += d3.event.dy
-            d3.select(this).attr("transform", function(d,i){
-                return "translate(" + [ d.x,d.y ] + ")"
-            })
+            d3.select(this).attr("cx", d.x)
+            d3.select(this).attr("cy", d.y)
         });
 
-    // checkCollision will be run at a specific interval (200ms?)
-    // passing in a snapshot of the positions of all the enemies at that moment
-    // and the player
-    var checkCollision() {
-      var playerR;
-      var playerX;
-      var playerY;
+    var checkCollision = function(enemy){
+      var player = d3.select(".player")
+      var xDiff = enemy.attr("cx") - player.attr("cx")
+      var yDiff = enemy.attr("cy") - player.attr("cy")
+      var distance = Math.sqrt(Math.pow(xDiff,2) + Math.pow(yDiff,2))
 
-      // inside for loop for all the enemies until we hit one
-      var enemyR;
-      var enemyX;
-      var enemyY;
-
-      var sumOfR = playerR + enemyR;
+      if(distance<radius*2){
+        updateHighScore();
+        score = 0;
+        updateScore();
+       }
+    };
 
 
-      var separation = Math.sqrt(Math.pow(playerX-enemyX) + Math.pow(playerY-enemyY));
-      if (separation < sumOfR) {
-        // OOPS!
-        // score gets set to zero; checks high score; game over type function to handle these things
-      }
-
-    }
 
     svg.selectAll("circle")
-      .data(playerData)
+      .data(data)
       .enter().append("circle")
-      .attr("r", radius)
-      .style("fill", "black")
-      .attr("class", "player")
-      .attr("transform", function(d,i){return ("translate(" + d.x + "," + d.y + ")")})
-      .call(drag);
-
-    svg.selectAll("circle")
-      .data(playerData.concat(data))
-      .enter().append("circle")
-      .attr("r", radius)
-      .style("fill", "green")
-      .attr("class", "enemy");
-
+      .attr({"r": radius, "class": "enemy"})
 
     svg.selectAll(".enemy")
-    //circles are still spawning out of bounds, TODO fix Math.random
        .attr("cx", function(){return Math.random()* ((width-radius*2) - (radius*2))  + (radius*2);})
        .attr("cy", function(){return Math.random()* ((height-radius*2) - (radius*2))  + (radius*2);})
 
+    svg.append("circle")
+      .data(playerData)
+      .attr({"class": "player", "cx": width/2, "cy": height/2, "r": radius})
+      .call(drag);
 
     setInterval(function() {
-        svg.selectAll(".enemy")
-           .transition()
-             .duration(1500)
-             .ease("linear")
-             .attr("cx", function(){return Math.random()* ((width-radius*2) - (radius*2))  + (radius*2);})
-             .attr("cy", function(){return Math.random()* ((height-radius*2) - (radius*2))  + (radius*2);});
+      svg.selectAll(".enemy")
+         .transition()
+           .duration(900)
+           .ease("cubic-in-out")
+           .attr("cx", function(){return Math.random()*((width-radius*2) - (radius*2))  + (radius*2);})
+           .attr("cy", function(){return Math.random()*((height-radius*2) - (radius*2))  + (radius*2);})
+           .tween("custom", function(d,i){
+              var enemy = d3.select(this);
+              return function(t) {
+                checkCollision(enemy)
+              }
+           })
+    }, 1000);
 
-    }, 1700);
-
-//function to get snapshot of enemy positions
-  var getEnemyPositions = function(){
-    var result = [];
-    var enemyX = this.attr("cx");
-    var enemyY = this.attr("cy");
-    result.push([enemyX, enemyY]);
-  };
-
-svg.selectAll(".enemy").each(getEnemyPositions);
+    setTimeout(function() { setInterval(function() { score++; updateScore(); }, 50); }, 1000);
 
     </script>
 
+    <style type="text/css">
 
+    body{
+      background: url(black.jpeg)
+    }
+
+    .container {
+      position: relative;
+      box-shadow: 0px 0px 10px rgba(0,0,0,1);
+      background: white;
+      padding: 40px;
+      margin-top: 40px;
+      margin-bottom: 40px;
+      width: 700px;
+      background: white;
+      padding: 40px;
+      margin-top: 40px;
+      margin-bottom: 40px;
+      margin: 0 auto;
+    }
+
+    .player{
+      fill: black;
+    }
+
+    .enemy{
+      fill: red;
+    }
+
+
+    #scores {
+      padding: 10px;
+      position: absolute;
+      top: 40px;
+      right: 40px;
+      background: #ddd;
+      text-align: right;
+      border-radius: 3px;
+    }
+    #scores span {
+      display: inline-block;
+      width: 50px;
+    }
 
 </html>
