@@ -19,11 +19,33 @@ Watchout!
 
     var data = _.range(0,nEnemies).map(function(i){return i;});
 
+  var drag = d3.behavior.drag()
+        .on("drag", function(d,i) {
+            d.x += d3.event.dx
+            d.y += d3.event.dy
+            d3.select(this).attr("transform", function(d,i){
+                return "translate(" + [ d.x,d.y ] + ")"
+            })
+        });
+
+
+    svg.selectAll("circle")
+      .data([{x:200, y:200}])
+      .enter().append("circle")
+      .attr("r", radius)
+      .style("fill", "black")
+      .attr("class", "player")
+      .attr("transform", function(d,i){return ("translate(" + d.x + "," + d.y + ")")})
+      .call(drag);
+
     svg.selectAll("circle")
       .data(data)
       .enter().append("circle")
       .attr("r", radius)
-      .style("fill", "red");
+      .style("fill", "red")
+      .attr("class", "enemy");
+
+
 
     svg.selectAll("circle")
     //circles are still spawning out of bounds, TODO fix Math.random
@@ -32,13 +54,14 @@ Watchout!
 
 
     setInterval(function() {
-        svg.selectAll("circle")
+        svg.selectAll(".enemy")
            .transition()
              .duration(900)
              .attr("cx", function(){return Math.random()* ((width-radius*2) - (radius*2))  + (radius*2);})
              .attr("cy", function(){return Math.random()* ((width-radius*2) - (radius*2))  + (radius*2);});
 
     }, 1000);
+
 
     </script>
 
