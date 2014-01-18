@@ -26,12 +26,19 @@ Watchout!
       .style("fill", "red");
 
     svg.selectAll("circle")
-       .attr("cx", function(){return Math.random()*(width-radius*2);})
-       .attr("cy", function(){return Math.random()*(height-radius*2);});
+    //circles are still spawning out of bounds, TODO fix Math.random
+       .attr("cx", function(){return Math.random()* ((width-radius*2) - (radius*2))  + (radius*2);})
+       .attr("cy", function(){return Math.random()* ((width-radius*2) - (radius*2))  + (radius*2);})
 
 
+    setInterval(function() {
+        svg.selectAll("circle")
+           .transition()
+             .duration(900)
+             .attr("cx", function(){return Math.random()* ((width-radius*2) - (radius*2))  + (radius*2);})
+             .attr("cy", function(){return Math.random()* ((width-radius*2) - (radius*2))  + (radius*2);});
 
-
+    }, 1000);
 
     </script>
 
