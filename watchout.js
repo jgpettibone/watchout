@@ -49,16 +49,24 @@
        }
     };
 
+    svg.append('filter')
+      .attr('id', 'image')
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .append('feImage')
+      .attr('xlink:href', 'shuriken-icon.png')
+
     svg.selectAll("circle")
       .data(data)
       .enter()
       .append("circle")
       .attr('class', 'enemy')
-      .attr({"r": radius})
+      .attr("r", radius)
+      .attr('filter', 'url(#image)')
 
     svg.selectAll(".enemy")
-       .attr("cx", function(){return Math.random()* ((width-radius*2) - (radius*2))  + (radius*2);})
-       .attr("cy", function(){return Math.random()* ((height-radius*2) - (radius*2))  + (radius*2);})
+      .attr("cx", function(){return Math.random()* ((width-radius*2) - (radius*2))  + (radius*2);})
+      .attr("cy", function(){return Math.random()* ((height-radius*2) - (radius*2))  + (radius*2);})
 
     svg.append("circle")
       .data(playerData)
