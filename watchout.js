@@ -49,19 +49,12 @@
        }
     };
 
-
-
     svg.selectAll("circle")
       .data(data)
-      .enter().append("circle")
-      .attr({"r": radius, "class": "enemy"})
-      // .append("image")
-      // .attr("xlink:href", "shuriken-icon.png")
-      // .attr('x', 0)
-      // .attr('y', 0)
-      // .attr('width', 20)
-      // .attr('height', 20);
-
+      .enter()
+      .append("circle")
+      .attr('class', 'enemy')
+      .attr({"r": radius})
 
     svg.selectAll(".enemy")
        .attr("cx", function(){return Math.random()* ((width-radius*2) - (radius*2))  + (radius*2);})
