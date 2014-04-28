@@ -50,11 +50,18 @@
     };
 
     svg.append('filter')
-      .attr('id', 'image')
+      .attr('id', 'shuriken')
       .attr('width', '100%')
       .attr('height', '100%')
       .append('feImage')
       .attr('xlink:href', 'shuriken-icon.png')
+
+    svg.append('filter')
+      .attr('id', 'ninja')
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .append('feImage')
+      .attr('xlink:href', 'ninja.png')
 
     svg.selectAll("circle")
       .data(data)
@@ -62,7 +69,7 @@
       .append("circle")
       .attr('class', 'enemy')
       .attr("r", radius)
-      .attr('filter', 'url(#image)')
+      .attr('filter', 'url(#shuriken)')
 
     svg.selectAll(".enemy")
       .attr("cx", function(){return Math.random()* ((width-radius*2) - (radius*2))  + (radius*2);})
@@ -71,6 +78,7 @@
     svg.append("circle")
       .data(playerData)
       .attr({"class": "player", "cx": width/2, "cy": height/2, "r": radius})
+      .attr('filter', 'url(#ninja)')
       .call(drag);
 
     setInterval(function() {
